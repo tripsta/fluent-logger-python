@@ -61,15 +61,31 @@ Then, please create the events like this. This will send the event to fluent, wi
 This client-library also has FluentHanler class for Python logging module.
 
     import logging
+    import socket
     from fluent import handler
+    
+    FORMAT = {
+        'host': socket.gethostname(),
+        'error_line': 'lineno',
+        'error_file': 'filename',
+        'code': 'levelno',
+        'type': 'levelname',
+        'logger': 'name',
+        'module': 'module',
+        'funcname': 'funcName',
+        'stackTrace': 'exc_info',
+        'error_str': 'msg'
+    }
+
+    formatter = handler.FluentRecordFormatter(FORMAT)
     
     logging.basicConfig(level=logging.INFO)
     l = logging.getLogger('fluent.test')
-    l.addHandler(handler.FluentHandler('app.follow', host='host', port=24224))
-    l.info({
-      'from': 'userA',
-      'to': 'userB'
-    })
+    fluent_handler = handler.FluentHandler('fluentd.enviroment', host='host', port=24224)
+    fluent_handler.setLevel(logging.INFO)
+    fluent_handler.setFormatter(formatter)
+    l.addHandler(fluent_handler)
+    l.info("Log this stuff!")
     
 ## Contributors
 
