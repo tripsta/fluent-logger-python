@@ -7,8 +7,12 @@ import traceback
 
 try:
     import simplejson as json
+    from simplejson import JSONDecodeError 
 except ImportError:
     import json
+
+    class JSONDecodeError(ValueError):
+        pass
 
 from fluent import sender
 
@@ -44,7 +48,7 @@ class FluentRecordFormatter(object):
         elif isinstance(msg, str):
             try:
                 self._add_dic(data, json.loads(str(msg)))
-            except (ValueError, json.JSONDecodeError):
+            except (ValueError, JSONDecodeError):
                 pass
 
     def format_data(self, record):
